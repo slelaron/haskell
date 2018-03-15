@@ -11,7 +11,7 @@ order3 :: Ord a => (a, a, a) -> (a, a, a)
 order3 = (\[a, b, c] -> (a, b, c)) . sort . (\(a, b, c) -> (a : b : [c]))
 
 smartReplicate :: Enum a => [a] -> [a]
-smartReplicate = foldr (\x -> (++) (replicate (fromEnum x) x)) []
+smartReplicate = concatMap (\x -> (replicate (fromEnum x) x))
 
 contains :: Eq a => a -> [[a]] -> [[a]]
 contains = filter . elem
@@ -56,7 +56,7 @@ data Week = Sunday
           deriving (Enum, Bounded, Show, Eq)
 
 afterDays :: Week -> Int -> Week
-afterDays day amount = toEnum $ rem (fromEnum day + amount) $ (+1) $ fromEnum (maxBound :: Week)
+afterDays day amount = toEnum $ mod (fromEnum day + amount) $ (+1) $ fromEnum (maxBound :: Week)
 
 nextDay :: Week -> Week
 nextDay = (`afterDays` 1)
@@ -391,6 +391,10 @@ data Builder = One Char
 instance Semigroup Builder where
     (<>) :: Builder -> Builder -> Builder
     a <> b = Many [a, b]
+
+instance Eq Builder where
+    (==) :: Builder -> Builder -> Bool
+    a == b = toString a == toString b
 
 instance Monoid Builder where
     mappend :: Builder -> Builder -> Builder
