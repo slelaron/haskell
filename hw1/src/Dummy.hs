@@ -11,7 +11,7 @@ order3 :: Ord a => (a, a, a) -> (a, a, a)
 order3 = (\[a, b, c] -> (a, b, c)) . sort . (\(a, b, c) -> (a : b : [c]))
 
 smartReplicate :: Enum a => [a] -> [a]
-smartReplicate = concatMap (\x -> (replicate (fromEnum x) x))
+smartReplicate = concatMap (\x -> replicate (fromEnum x) x)
 
 contains :: Eq a => a -> [[a]] -> [[a]]
 contains = filter . elem
