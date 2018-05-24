@@ -1,0 +1,7 @@
+mut a = 0;
+mut c = 0 / 0;
+for i = 0 until 100 {
+    a = a + 1;
+    mut b = let d = 0 in 5;
+}
+< a;

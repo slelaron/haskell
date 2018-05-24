@@ -314,8 +314,8 @@ stream :: Eq s => [s] -> Parser s [s]
 stream s = Parser $ \x -> stripPrefix s x >>= \b -> return (s, b)
 
 parenthesis :: Parser Char ()
-parenthesis = let inter = (element '(' >>= const inter >>= const (element ')') >>= const inter) <|> ok in
-    inter >>= const eof
+parenthesis = let inter = (element '(' >> inter >> (element ')') >> inter) <|> ok in
+    inter >> eof
 
 integer :: Parser Char Int
 integer = (satisfy isSign <|> (pure '+')) >>= \x -> transform x <$> pnumber
@@ -332,22 +332,22 @@ integer = (satisfy isSign <|> (pure '+')) >>= \x -> transform x <$> pnumber
         _   -> num
 
 pinteger :: Parser Char Int
-pinteger = integer >>= \x -> eof >>= const (return x)
+pinteger = integer >>= \x -> eof >> return x
 
 listOflist :: Parser Char [[Int]]
 listOflist = wrap integer >>= 
     \x -> ntimes x >>= 
-    \y -> (y :) <$> ((wrap (element ',') >>= const listOflist) <|> (wrap eof >>= const (pure [])))
+    \y -> (y :) <$> ((wrap (element ',') >> listOflist) <|> (wrap eof >> (pure [])))
   where
     ntimes :: Int -> Parser Char [Int]
     ntimes n 
       | n == 0    = pure []
-      | otherwise = wrap (element ',') >>= 
-                    const (wrap integer) >>= 
+      | otherwise = wrap (element ',') >>
+                    (wrap integer) >>= 
                     \x -> (x :) <$> ntimes (n - 1)
 
     blink :: Parser Char String
     blink = pmany (satisfy $ \x -> elem x " \t\n")
 
     wrap :: Parser Char a -> Parser Char a
-    wrap p = blink >>= const p
+    wrap p = blink >> p
