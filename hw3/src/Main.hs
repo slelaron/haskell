@@ -276,4 +276,4 @@ main = do fileName   <- Prelude.head <$> getArgs
           {-print parsed-}
           case parsed of
             Right (Program statements) -> Control.Monad.Cont.void (runStateT (runContT (evaluateState statements) $ const (return NeedNotBreak)) Map.empty)
-            Left  _                    -> return ()
+            Left  err                  -> Exc.throw err
